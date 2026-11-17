@@ -1,0 +1,24 @@
+<%- include('partials/head', { title: child.name + ' 的成長日記' }) %>
+<%- include('partials/topbar') %>
+<main>
+  <% if (review) { %>
+  <section class="review">
+    <div class="review-label">✨ <%= review.label %></div>
+    <%- include('partials/card', { r: review.record }) %>
+  </section>
+  <% } %>
+
+  <% if (!records.length && page === 1) { %>
+  <div class="empty">
+    <p>還沒有任何紀錄。</p>
+    <p>按下方的「＋」，從相簿選一張照片開始吧！</p>
+  </div>
+  <% } %>
+
+  <% records.forEach(r => { %><%- include('partials/card', { r }) %><% }) %>
+
+  <% if (hasMore) { %>
+  <a class="loadmore" href="/?page=<%= page + 1 %>">看更早的紀錄 →</a>
+  <% } %>
+</main>
+<%- include('partials/nav', { nav: 'home' }) %>

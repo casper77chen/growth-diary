@@ -1,0 +1,78 @@
+<%- include('partials/head', { title: '設定' }) %>
+<%- include('partials/topbar') %>
+<main>
+  <h2><%- ICONS.gear %> 設定</h2>
+  <% if (message) { %><div class="flash"><%= message %></div><% } %>
+
+  <form method="post" action="/settings/child" class="card">
+    <h3><%= child.name %> 的基本資料</h3>
+    <label>名字 <input type="text" name="name" value="<%= child.name %>" required></label>
+    <label>生日 <input type="date" name="birthdate" value="<%= child.birthdate %>" required></label>
+    <div class="seg">
+      <label><input type="radio" name="sex" value="M" <%= child.sex === 'M' ? 'checked' : '' %>>男寶</label>
+      <label><input type="radio" name="sex" value="F" <%= child.sex === 'F' ? 'checked' : '' %>>女寶</label>
+    </div>
+
+    <label>主題色</label>
+    <div class="colorpick" data-name="themeColor">
+      <input type="color" name="themeColor" value="<%= child.theme_color %>">
+      <input type="text" value="<%= child.theme_color %>" pattern="^#[0-9a-fA-F]{6}$" maxlength="7" inputmode="text">
+    </div>
+    <div class="color-presets">
+      <% ['#658dc6','#F5D5E0','#F1E6B2','#9ED8C5','#E3B7A0'].forEach(c => { %>
+      <button type="button" class="color-preset" data-for="themeColor" data-color="<%= c %>" style="background:<%= c %>" aria-label="選色 <%= c %>"></button>
+      <% }) %>
+    </div>
+
+    <label>功能開關</label>
+    <div class="toggle-row">
+      <input type="checkbox" id="showPoop" name="show_poop" value="1" <%= child.show_poop ? 'checked' : '' %>>
+      <label for="showPoop">顯示排便記錄</label>
+    </div>
+    <div class="toggle-row">
+      <input type="checkbox" id="showMilk" name="show_milk" value="1" <%= child.show_milk ? 'checked' : '' %>>
+      <label for="showMilk">顯示喝奶記錄</label>
+    </div>
+    <p class="hint">小孩長大用不到時可以關掉，資料會保留，之後重新打開還看得到。</p>
+
+    <button type="submit" class="primary">儲存</button>
+  </form>
+
+  <div class="card">
+    <h3>App 圖示</h3>
+    <div class="icon-preview">
+      <img src="/icons/icon-192.png?v=<%= iconV %>" alt="目前的圖示">
+      <p class="hint"><%= hasCustomIcon ? '目前使用自訂圖示。' : '目前使用預設圖示（主題色＋小腳印）。' %></p>
+    </div>
+    <form method="post" action="/settings/icon" enctype="multipart/form-data" class="row wrap">
+      <input type="file" name="icon" accept="image/jpeg,image/png" required class="grow">
+      <button type="submit" class="primary" style="width:auto">上傳自訂圖示</button>
+    </form>
+    <p class="hint">建議上傳一張方形圖片；不是方形的話會自動置中裁切成正方形。</p>
+    <% if (hasCustomIcon) { %>
+    <form method="post" action="/settings/icon/reset">
+      <button type="submit">恢復預設圖示（小腳印）</button>
+    </form>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <h3>備份與匯出</h3>
+    <p class="hint">共 <%= stats.records %> 筆紀錄、<%= stats.photos %> 張照片、<%= stats.videos %> 部影片，約 <%= (stats.bytes / 1024 / 1024).toFixed(0) %> MB。</p>
+    <p class="hint">打包全部文字＋壓縮版照片影片成 zip，建議每季下載一次存到家裡硬碟。原始畫質正本在你們的 iCloud。</p>
+    <a class="btn" href="/export.zip">⬇️ 下載完整備份（zip）</a>
+  </div>
+
+  <form method="post" action="/settings/password" class="card">
+    <h3>更改密碼（<%= user.name %>）</h3>
+    <input type="password" name="oldPw" placeholder="舊密碼" required>
+    <input type="password" name="newPw" placeholder="新密碼" required>
+    <button type="submit" class="primary">更改</button>
+  </form>
+
+  <form method="post" action="/logout" class="card">
+    <button>登出</button>
+  </form>
+</main>
+<script src="/js/theme-picker.js"></script>
+<%- include('partials/nav', { nav: '' }) %>

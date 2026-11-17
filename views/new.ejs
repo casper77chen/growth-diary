@@ -1,0 +1,107 @@
+<%- include('partials/head', { title: '新增紀錄' }) %>
+<%- include('partials/topbar') %>
+<main>
+  <h2>新增紀錄</h2>
+  <form method="post" action="/records" enctype="multipart/form-data" id="newForm">
+    <label class="filepick">
+      <input type="file" name="files" id="files" multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm">
+      <span>📷 從相簿選照片或影片（可多選）</span>
+    </label>
+    <div id="preview" class="preview"></div>
+    <p class="hint">Live Photo 想保留動態，請先在 iPhone 相簿「存成影片」再選取。單檔上限 80MB。</p>
+
+    <div class="seg" id="typeSeg">
+      <label><input type="radio" name="type" value="daily" <%= presetType !== 'milestone' ? 'checked' : '' %>>日常紀錄</label>
+      <label><input type="radio" name="type" value="milestone" <%= presetType === 'milestone' ? 'checked' : '' %>><%- ICONS.award %> 里程碑</label>
+      <% if (child.show_poop) { %><button type="button" class="segbtn" id="poopBtn">💩 排便</button><% } %>
+      <% if (child.show_milk) { %><button type="button" class="segbtn" id="milkBtn">🍼 喝奶</button><% } %>
+    </div>
+
+    <div id="msBox" class="<%= presetType === 'milestone' ? '' : 'hidden' %>">
+      <select name="milestone_id" id="msSelect">
+        <option value="">選一個里程碑…</option>
+        <% milestones.filter(m => !m.done).forEach(m => { %>
+        <option value="<%= m.id %>" <%= String(m.id) === presetMilestone ? 'selected' : '' %>><%= m.name %><%= m.typical_from ? `（常見 ${m.typical_from}-${m.typical_to} 個月）` : '' %></option>
+        <% }) %>
+        <% if (milestones.some(m => m.done)) { %>
+        <optgroup label="已達成過（再記一次也可以）">
+          <% milestones.filter(m => m.done).forEach(m => { %>
+          <option value="<%= m.id %>"><%= m.name %></option>
+          <% }) %>
+        </optgroup>
+        <% } %>
+        <option value="__new">＋ 新增自訂里程碑…</option>
+      </select>
+      <input type="text" name="new_milestone" id="newMs" class="hidden" placeholder="自訂里程碑名稱，例如：第一次游泳">
+    </div>
+
+    <label>誰拍的？（其他家人拍的照片，爸媽也能幫忙記錄進來）</label>
+    <div class="seg" id="recorderSeg">
+      <% recorders.forEach(n => { %>
+      <label><input type="radio" name="recorder" value="<%= n %>" <%= n === user.name ? 'checked' : '' %>><%= n %></label>
+      <% }) %>
+      <label><input type="radio" name="recorder" value="__other">其他…</label>
+    </div>
+    <input type="text" name="recorder_other" id="recorderOther" class="hidden" placeholder="拍攝者名字，例如：阿嬤（下次會出現在選項裡）">
+
+    <input type="text" name="title" placeholder="標題（里程碑可留空，會自動帶入）">
+    <textarea name="note" rows="3" placeholder="一句話描述這個時刻…（也可以之後再補）"></textarea>
+
+    <div class="row">
+      <label class="grow">日期
+        <input type="date" name="date" id="dateInput" value="<%= todayStr %>" required>
+      </label>
+      <label class="approx"><input type="checkbox" name="date_approx" value="1">大約這段時間</label>
+    </div>
+    <p class="hint hidden" id="exifHint"></p>
+
+    <input type="text" name="tags" placeholder="標籤（用空格或逗號分開，例如：阿公阿嬤 旅行）">
+    <% if (usedTags.length) { %>
+    <div class="seg tagchecks">
+      <% usedTags.forEach(t => { %>
+      <label><input type="checkbox" name="tag_check" value="<%= t %>">#<%= t %></label>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <button type="submit" class="primary" id="submitBtn">完成紀錄</button>
+  </form>
+
+  <% if (child.show_poop) { %>
+  <dialog id="poopDialog">
+    <form method="post" action="/poop">
+      <h3>💩 記一次排便</h3>
+      <label>日期 <select name="date" id="poopDate"></select></label>
+      <label>時間 <input type="time" name="time" id="poopTime"></label>
+      <p class="hint">預設記今天，忘了記可往前補一週，累積到「成長」頁的每日排便次數。</p>
+      <div class="dialog-actions">
+        <button type="button" id="poopCancel">取消</button>
+        <button type="submit" class="primary">儲存</button>
+      </div>
+    </form>
+  </dialog>
+  <% } %>
+
+  <% if (child.show_milk) { %>
+  <dialog id="milkDialog">
+    <form method="post" action="/milk">
+      <h3>🍼 記一次喝奶</h3>
+      <label>日期 <select name="date" id="milkDate"></select></label>
+      <label>時間 <input type="time" name="time" id="milkTime"></label>
+      <div class="seg">
+        <label><input type="radio" name="kind" value="母奶" <%= lastMilkKind === '母奶' ? 'checked' : '' %>>🤱 母奶</label>
+        <label><input type="radio" name="kind" value="配方奶" <%= lastMilkKind === '配方奶' ? 'checked' : '' %>>🍼 配方奶</label>
+      </div>
+      <label>奶量（ml）<input type="number" name="ml" id="milkMl" min="1" step="1" inputmode="numeric" placeholder="例如 120" value="<%= lastMilkMl %>" required></label>
+      <p class="hint">預設記今天，忘了記可往前補一週，累積到「成長」頁的每日奶量。種類和奶量先帶上次的，不同直接改。</p>
+      <div class="dialog-actions">
+        <button type="button" id="milkCancel">取消</button>
+        <button type="submit" class="primary">儲存</button>
+      </div>
+    </form>
+  </dialog>
+  <% } %>
+</main>
+<script src="/vendor/exifr-lite.umd.js"></script>
+<script src="/js/new.js"></script>
+<%- include('partials/nav', { nav: 'new' }) %>

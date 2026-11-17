@@ -1,0 +1,29 @@
+<a class="card record-card type-<%= r.type %>" href="/records/<%= r.id %>">
+  <div class="card-meta">
+    <span><%= r.date %><%= r.date_approx ? '（大約）' : '' %></span>
+    <span class="age-chip"><%= r.age %></span>
+    <% if (r.favorite) { %><span>❤️</span><% } %>
+  </div>
+  <div class="card-title">
+    <% if (r.type === 'milestone') { %><span class="badge badge-ms"><%- ICONS.award %> 里程碑</span><% } %>
+    <% if (r.type === 'growth') { %><span class="badge badge-gr"><%- ICONS.trend %> 成長數據</span><% } %>
+    <%= r.title || r.milestone_name || (r.type === 'growth' ? '' : '（未命名）') %>
+  </div>
+  <% if (r.note) { %><p class="card-note"><%= r.note.length > 80 ? r.note.slice(0, 80) + '…' : r.note %></p><% } %>
+  <% if (r.media && r.media.length) { %>
+  <div class="media-grid n<%= Math.min(r.media.length, 4) %>">
+    <% r.media.slice(0, 4).forEach((m, i) => { %>
+      <% if (m.kind === 'photo') { %>
+        <img src="/media/<%= m.thumb %>" loading="lazy" alt="">
+      <% } else { %>
+        <video src="/media/<%= m.file %>" preload="metadata" muted playsinline></video>
+      <% } %>
+    <% }) %>
+    <% if (r.media.length > 4) { %><div class="more-media">+<%= r.media.length - 4 %></div><% } %>
+  </div>
+  <% } %>
+  <div class="card-foot">
+    <span><%= r.credit %></span>
+    <% if (r.tags && r.tags.length) { %><span class="tags"><% r.tags.forEach(t => { %>#<%= t %> <% }) %></span><% } %>
+  </div>
+</a>

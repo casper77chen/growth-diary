@@ -1,0 +1,39 @@
+<%- include('partials/head', { title: '搜尋' }) %>
+<%- include('partials/topbar') %>
+<main>
+  <h2><%- ICONS.search %> 搜尋與整理</h2>
+  <form method="get" action="/search" class="card">
+    <input type="search" name="q" value="<%= params.q %>" placeholder="搜尋文字…">
+    <div class="row wrap">
+      <select name="type">
+        <option value="">全部類型</option>
+        <option value="milestone" <%= params.type === 'milestone' ? 'selected' : '' %>>里程碑</option>
+        <option value="daily" <%= params.type === 'daily' ? 'selected' : '' %>>日常紀錄</option>
+        <option value="growth" <%= params.type === 'growth' ? 'selected' : '' %>>成長數據</option>
+      </select>
+      <select name="by">
+        <option value="">誰拍的／記錄的都行</option>
+        <% recorders.forEach(n => { %>
+        <option value="<%= n %>" <%= n === params.by ? 'selected' : '' %>><%= n %></option>
+        <% }) %>
+      </select>
+      <select name="tag">
+        <option value="">全部標籤</option>
+        <% tags.forEach(t => { %>
+        <option value="<%= t %>" <%= t === params.tag ? 'selected' : '' %>>#<%= t %></option>
+        <% }) %>
+      </select>
+      <label class="approx"><input type="checkbox" name="fav" value="1" <%= params.fav ? 'checked' : '' %>>❤️ 只看收藏</label>
+    </div>
+    <button type="submit" class="primary">搜尋</button>
+  </form>
+
+  <% if (hasQuery) { %>
+    <p class="hint">找到 <%= total %> 筆</p>
+    <% rows.forEach(r => { %><%- include('partials/card', { r }) %><% }) %>
+    <% if (hasMore) { %>
+    <a class="loadmore" href="/search?<%= new URLSearchParams({ ...params, page: page + 1 }).toString() %>">更多結果 →</a>
+    <% } %>
+  <% } %>
+</main>
+<%- include('partials/nav', { nav: 'search' }) %>

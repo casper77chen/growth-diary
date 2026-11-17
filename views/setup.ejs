@@ -1,0 +1,34 @@
+<%- include('partials/head', { title: '初次設定' }) %>
+<main class="auth">
+  <h1>🍼 歡迎！先做初次設定</h1>
+  <% if (error) { %><div class="flash error"><%= error %></div><% } %>
+  <form method="post" action="/setup" class="card">
+    <% if (token) { %><input type="hidden" name="token" value="<%= token %>"><% } %>
+    <h3>寶寶資料</h3>
+    <label>名字（暱稱）<input type="text" name="childName" value="<%= defaultName %>" placeholder="例如：小寶" required></label>
+    <label>生日 <input type="date" name="birthdate" required></label>
+    <div class="seg">
+      <label><input type="radio" name="sex" value="M" checked>男寶</label>
+      <label><input type="radio" name="sex" value="F">女寶</label>
+    </div>
+    <label>主題色</label>
+    <div class="colorpick" data-name="themeColor">
+      <input type="color" name="themeColor" value="<%= defaultColor %>">
+      <input type="text" value="<%= defaultColor %>" pattern="^#[0-9a-fA-F]{6}$" maxlength="7" inputmode="text">
+    </div>
+    <div class="color-presets">
+      <% ['#658dc6','#F5D5E0','#F1E6B2','#9ED8C5','#E3B7A0'].forEach(c => { %>
+      <button type="button" class="color-preset" data-for="themeColor" data-color="<%= c %>" style="background:<%= c %>" aria-label="選色 <%= c %>"></button>
+      <% }) %>
+    </div>
+    <p class="hint">之後可以在設定頁更改主題色。</p>
+    <h3>爸媽帳號</h3>
+    <label>爸爸的密碼 <input type="password" name="papaPw" required></label>
+    <label>媽媽的密碼 <input type="password" name="mamaPw" required></label>
+    <p class="hint">之後可以在設定頁各自更改密碼。</p>
+    <button type="submit" class="primary">開始使用</button>
+  </form>
+</main>
+<script src="/js/theme-picker.js"></script>
+</body>
+</html>

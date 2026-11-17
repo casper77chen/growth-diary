@@ -1,0 +1,16 @@
+<%- include('partials/head', { title: '登入' }) %>
+<main class="auth">
+  <h1>🍼 <%= child ? child.name : '' %> 的成長日記</h1>
+  <% if (error) { %><div class="flash error"><%= error %></div><% } %>
+  <form method="post" action="/login" class="card">
+    <div class="seg">
+      <% users.forEach((u, i) => { %>
+      <label><input type="radio" name="uid" value="<%= u.id %>" <%= i === 0 ? 'checked' : '' %>><%= u.name %></label>
+      <% }) %>
+    </div>
+    <input type="password" name="password" placeholder="密碼" required autofocus>
+    <button type="submit" class="primary">登入</button>
+  </form>
+</main>
+</body>
+</html>

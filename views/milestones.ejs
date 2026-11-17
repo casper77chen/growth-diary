@@ -1,0 +1,43 @@
+<%- include('partials/head', { title: '里程碑' }) %>
+<%- include('partials/topbar') %>
+<main>
+  <h2><%- ICONS.award %> 里程碑</h2>
+
+  <% if (todo.length) { %>
+  <h3 class="section-title">待收集（<%= todo.length %>）</h3>
+  <p class="hint">快到常見月齡了就多留意，隨時準備好相機！</p>
+  <div class="ms-list">
+    <% todo.forEach(m => { %>
+    <a class="ms-item todo" href="/new?type=milestone&milestone=<%= m.id %>">
+      <span class="ms-dot">○</span>
+      <span class="ms-name"><%= m.name %></span>
+      <% if (m.typical_from) { %><span class="ms-range">常見 <%= m.typical_from %>-<%= m.typical_to %> 個月</span><% } %>
+    </a>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <% if (done.length) { %>
+  <h3 class="section-title">已達成（<%= done.length %>）</h3>
+  <div class="ms-list">
+    <% done.forEach(m => { %>
+    <a class="ms-item done" href="/records/<%= m.record_id %>">
+      <span class="ms-dot">✅</span>
+      <span class="ms-name"><%= m.name %></span>
+      <span class="ms-range"><%= m.done_date %>・<%= m.age %></span>
+    </a>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <form method="post" action="/milestones" class="card">
+    <h3>新增自訂里程碑</h3>
+    <input type="text" name="name" placeholder="例如：第一次游泳" required>
+    <div class="row">
+      <label class="grow">常見月齡從 <input type="number" name="typical_from" step="0.5" min="0" placeholder="選填"></label>
+      <label class="grow">到 <input type="number" name="typical_to" step="0.5" min="0" placeholder="選填"></label>
+    </div>
+    <button type="submit" class="primary">新增</button>
+  </form>
+</main>
+<%- include('partials/nav', { nav: 'milestones' }) %>

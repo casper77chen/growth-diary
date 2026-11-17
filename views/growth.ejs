@@ -1,0 +1,75 @@
+<%- include('partials/head', { title: '成長數據' }) %>
+<%- include('partials/topbar') %>
+<main>
+  <h2><%- ICONS.trend %> 成長數據</h2>
+
+  <div class="seg" id="metricTabs">
+    <% metrics.forEach((m, i) => { %>
+    <label><input type="radio" name="mtab" value="<%= m.id %>" <%= i === 0 && !selectedTab ? 'checked' : '' %>><%= m.name %></label>
+    <% }) %>
+    <% if (child.show_milk) { %><label><input type="radio" name="mtab" value="milk" <%= selectedTab === 'milk' ? 'checked' : '' %>>奶量</label><% } %>
+    <% if (child.show_poop) { %><label><input type="radio" name="mtab" value="poop" <%= selectedTab === 'poop' ? 'checked' : '' %>>排便次數</label><% } %>
+  </div>
+
+  <div class="card">
+    <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    <p class="hint" id="chartHint"></p>
+  </div>
+
+  <form method="post" action="/growth" class="card">
+    <h3>新增測量</h3>
+    <label>日期 <input type="date" name="date" value="<%= todayStr %>" required></label>
+    <div class="metric-inputs">
+      <% metrics.forEach(m => { %>
+      <label><%= m.name %>
+        <span class="unit-wrap"><input type="number" name="metric_<%= m.id %>" step="any" min="0" inputmode="decimal" placeholder="—"><span class="unit"><%= m.unit %></span></span>
+      </label>
+      <% }) %>
+    </div>
+    <p class="hint">有量的填，沒量的留空就好。</p>
+    <button type="submit" class="primary">儲存</button>
+  </form>
+
+  <div class="card" id="entriesCard">
+    <h3>歷史紀錄</h3>
+    <table class="entries" id="entriesTable"></table>
+  </div>
+
+  <details class="card">
+    <summary>自訂項目管理（例如牙齒數量、鞋子尺寸）</summary>
+    <form method="post" action="/metrics">
+      <div class="row">
+        <input type="text" name="name" placeholder="項目名稱" required class="grow">
+        <input type="text" name="unit" placeholder="單位" required style="width:80px">
+      </div>
+      <button type="submit" class="primary">新增項目</button>
+    </form>
+    <% const custom = metrics.filter(m => !m.builtin); %>
+    <% if (custom.length) { %>
+    <ul class="metric-manage">
+      <% custom.forEach(m => { %>
+      <li>
+        <span><%= m.name %>（<%= m.unit %>）<span class="hint"><%= m.entries.length %> 筆</span></span>
+        <form method="post" action="/metrics/<%= m.id %>/delete"
+          onsubmit="return confirm(this.dataset.msg)"
+          data-msg="刪除「<%= m.name %>」？底下 <%= m.entries.length %> 筆測量會一起刪除，無法復原。">
+          <button type="submit" class="del">刪除項目</button>
+        </form>
+      </li>
+      <% }) %>
+    </ul>
+    <% } %>
+  </details>
+</main>
+<script>
+window.GROWTH_DATA = <%- JSON.stringify({
+  metrics: metrics.map(m => ({ id: m.id, name: m.name, unit: m.unit, who: m.who,
+    entries: m.entries.map(e => ({ id: e.id, date: e.date, value: e.value, ageMonths: e.ageMonths, age: e.age, by: e.by_name })) }))
+    .concat(child.show_milk ? [{ id: 'milk', name: '每日奶量', unit: 'ml', who: null, entries: milkEntries }] : [])
+    .concat(child.show_poop ? [{ id: 'poop', name: '排便次數', unit: '次', who: null, entries: poopEntries }] : []),
+  sex: child.sex,
+}) %>;
+</script>
+<script src="/vendor/chart.umd.js"></script>
+<script src="/js/growth.js"></script>
+<%- include('partials/nav', { nav: 'growth' }) %>

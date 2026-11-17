@@ -1,0 +1,21 @@
+<nav class="bottomnav">
+  <a href="/" class="<%= nav==='home' ? 'on' : '' %>">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    時間軸
+  </a>
+  <a href="/milestones" class="<%= nav==='milestones' ? 'on' : '' %>">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+    里程碑
+  </a>
+  <a href="/new" class="addbtn" aria-label="新增紀錄">＋</a>
+  <a href="/growth" class="<%= nav==='growth' ? 'on' : '' %>">
+    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    成長
+  </a>
+  <a href="/search" class="<%= nav==='search' ? 'on' : '' %>">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    搜尋
+  </a>
+</nav>
+</body>
+</html>

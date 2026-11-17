@@ -1,0 +1,72 @@
+<%- include('partials/head', { title: r.title || r.milestone_name || '紀錄' }) %>
+<%- include('partials/topbar') %>
+<main>
+  <a class="back" href="javascript:history.back()">← 返回</a>
+  <div class="card">
+    <div class="card-meta">
+      <span><%= r.date %><%= r.date_approx ? '（大約）' : '' %></span>
+      <span class="age-chip"><%= r.age %></span>
+    </div>
+    <h2>
+      <% if (r.type === 'milestone') { %><%- ICONS.award %> <% } %>
+      <%= r.title || r.milestone_name || '（未命名）' %>
+    </h2>
+    <% if (r.type === 'milestone' && r.milestone_name && r.title !== r.milestone_name) { %>
+      <p class="hint">里程碑：<%= r.milestone_name %></p>
+    <% } %>
+    <% if (r.note) { %><p class="note"><%= r.note %></p><% } %>
+    <% if (r.measurements && r.measurements.length) { %>
+      <div><% r.measurements.forEach(m => { %><span class="pill"><%= m.name %> <%= m.value %><%= m.unit %></span> <% }) %></div>
+    <% } %>
+    <% r.media.forEach(m => { %>
+      <% if (m.kind === 'photo') { %>
+        <img class="full-media" src="/media/<%= m.file %>" alt="">
+      <% } else { %>
+        <video class="full-media" src="/media/<%= m.file %>" controls playsinline preload="metadata"></video>
+      <% } %>
+    <% }) %>
+    <div class="card-foot">
+      <span><%= r.credit %></span>
+      <% if (r.tags.length) { %><span class="tags"><% r.tags.forEach(t => { %><a href="/search?tag=<%= encodeURIComponent(t) %>">#<%= t %></a> <% }) %></span><% } %>
+    </div>
+    <div class="actions">
+      <form method="post" action="/records/<%= r.id %>/favorite"><button><%= r.favorite ? '❤️ 已收藏' : '🤍 收藏' %></button></form>
+      <button type="button" onclick="document.getElementById('editBox').classList.toggle('hidden')">✏️ 編輯</button>
+      <form method="post" action="/records/<%= r.id %>/delete" onsubmit="return confirm('確定要刪除這筆紀錄嗎？照片壓縮檔也會一起刪除（iCloud 原圖不受影響）')">
+        <button class="danger">🗑 刪除</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card hidden" id="editBox">
+    <h3>編輯紀錄</h3>
+    <form method="post" action="/records/<%= r.id %>" enctype="multipart/form-data">
+      <input type="text" name="title" value="<%= r.title %>" placeholder="標題">
+      <textarea name="note" rows="4" placeholder="描述"><%= r.note %></textarea>
+      <div class="row">
+        <label class="grow">日期 <input type="date" name="date" value="<%= r.date %>"></label>
+        <label class="approx"><input type="checkbox" name="date_approx" value="1" <%= r.date_approx ? 'checked' : '' %>>大約</label>
+      </div>
+      <input type="text" name="tags" value="<%= r.tags.join(' ') %>" placeholder="標籤（空格分開）">
+      <label class="filepick">
+        <input type="file" name="files" multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm">
+        <span>📷 補加照片或影片（可多選）</span>
+      </label>
+      <p class="hint">Live Photo 想保留動態，請先在 iPhone 相簿「存成影片」再選取。單檔上限 80MB。</p>
+      <button type="submit" class="primary">儲存</button>
+    </form>
+    <% if (r.media.length) { %>
+    <p class="hint">已上傳的檔案（移除只刪 app 裡的壓縮檔，iCloud 原圖不受影響）：</p>
+    <div class="edit-media">
+      <% r.media.forEach(m => { %>
+      <form method="post" action="/records/<%= r.id %>/media/<%= m.id %>/delete" class="edit-media-item"
+            onsubmit="return confirm('移除這個檔案？')">
+        <% if (m.kind === 'photo') { %><img src="/media/<%= m.thumb %>" alt=""><% } else { %><span class="edit-media-video">🎬</span><% } %>
+        <button class="danger">移除</button>
+      </form>
+      <% }) %>
+    </div>
+    <% } %>
+  </div>
+</main>
+<%- include('partials/nav', { nav: '' }) %>
