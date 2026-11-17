@@ -4,6 +4,23 @@
 只給爸爸媽媽兩人用（設定時各自設一組密碼），名字、主題色、圖示都在網頁上設定，不用改任何程式碼，
 一份程式可以讓很多家庭各自部署、各自用自己的資料。
 
+<p>
+<img src="docs/screenshots/02-時間軸.png" width="200" alt="時間軸">
+<img src="docs/screenshots/04-里程碑.png" width="200" alt="里程碑">
+<img src="docs/screenshots/05-成長曲線.png" width="200" alt="成長曲線">
+<img src="docs/screenshots/07-新增紀錄.png" width="200" alt="新增紀錄">
+</p>
+
+換主題色的樣子：
+
+<p>
+<img src="docs/screenshots/10-主題色-粉.png" width="200" alt="粉色主題">
+<img src="docs/screenshots/11-主題色-綠.png" width="200" alt="綠色主題">
+<img src="docs/screenshots/12-主題色-杏.png" width="200" alt="杏色主題">
+</p>
+
+（截圖是示範資料，「小豆」不是真的小孩，照片是插圖。全部 12 張在 [`docs/screenshots/`](docs/screenshots/)。）
+
 ## 功能
 
 - **時間軸**：日常紀錄＋照片影片（手機拍的照片會自動壓縮，原始畫質建議留在 iCloud）

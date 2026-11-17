@@ -48,9 +48,13 @@
         });
       }
     }
+    // 線色跟主題色走；資料點太密（每天一筆的奶量／排便）時不畫圓點，否則會糊成一條粗帶
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#658dc6';
+    const dense = m.entries.length > 60;
     datasets.push({
       label: m.name, data: m.entries.map(e => ({ x: e.ageMonths, y: e.value })),
-      borderColor: '#658dc6', backgroundColor: '#658dc6', pointRadius: 4, borderWidth: 2, tension: .2, fill: false,
+      borderColor: accent, backgroundColor: accent, pointRadius: dense ? 0 : 4, pointHitRadius: 6,
+      borderWidth: dense ? 1.5 : 2, tension: .2, fill: false,
     });
     if (chart) chart.destroy();
     chart = new Chart(canvas, {
